@@ -2,8 +2,10 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 using std::cout;
 using std::endl;
+using std::vector; 
 using std::string;
 
 
@@ -117,38 +119,42 @@ const char* String::c_str() const
 String & String::operator=(const String & str1)
 {
   
-    _pstr=new char[str1.size()+1]();
-    strcpy(_pstr,str1.c_str());
-    *this = str1;
-    return *this;
+   if(this!=&str1)
+   {
+       delete[]_pstr;//回收左操作数空间
+       _pstr=new char[strlen(str1._pstr)+1]();//深拷贝
+       strcpy(_pstr,str1._pstr);
+   }
+   return *this;
 
 }
 
 String & String::operator=(const char * str1)
 {
-    _pstr=new char[strlen(str1)+1]();
-    strcpy(_pstr,str1);
-    *this=String(str1);
+    String tmp(str1);
+    *this = tmp;
     return *this;
 
 }
-bool operator==(const String & str1, const String &str2)
+bool operator==(const String & lhs, const String &rhs)
 {
-    return !strcmp(str1.c_str(),str2.c_str());
+    return !strcmp(rhs.c_str(),lhs.c_str());
 }
 
-bool operator!=(const String & str1, const String &str2)
+bool operator!=(const String & lhs, const String &rhs)
 {
-    return strcmp(str1.c_str(),str2.c_str());
+    return !(lhs==rhs);
 }
 
  String & String::operator+=(const String & str1)
  {
      char *temp=_pstr;
-    _pstr=new char[str1.size()+strlen(_pstr)+1];
-    if(!temp)
-    strcpy(_pstr,temp);
-    strcat(_pstr,str1.c_str());
+     _pstr=new char[str1.size()+strlen(_pstr)+1];
+     if(!temp)
+     strcpy(_pstr,temp);
+     strcat(_pstr,str1.c_str());
+     delete []temp;
+     return * this;
 
  }
 
@@ -156,11 +162,9 @@ bool operator!=(const String & str1, const String &str2)
 String & String::operator+=(const char * str1)
 {
 
-    char *temp=_pstr;
-    _pstr=new char[strlen(str1)+strlen(_pstr)+1];
-    if(!temp)
-    strcpy(_pstr,temp);
-    strcat(_pstr,str1);
+    String tmp(str1);
+    *this +=tmp;
+    return * this;
   
   
 
@@ -195,31 +199,25 @@ bool operator>(const String &str1, const String &str2)
 }
 
 
-bool operator<=(const String &str1, const String &str2)
+bool operator<=(const String &lhs, const String &rhs)
 {
-    int retval=strcmp(str1.c_str(),str2.c_str());
-    if(retval<0||retval==0)
+   if(lhs < rhs || lhs == rhs)
     {
-        return 1;
+        return true;
+    }else {
+        return false;
     }
-    else
-    {
-        return 0;
-    }
-    
 }
 
-bool operator>=(const String &str1, const String &str2)
+bool operator>=(const String &lhs, const String &rhs)
 {
-     int retval=strcmp(str1.c_str(),str2.c_str());
-    if(retval>0||retval==0)
+    if(lhs > rhs || lhs == rhs)
     {
-        return 1;
+        return true;
+    }else {
+        return false;
     }
-    else
-    {
-        return 0;
-    }
+     
     
 }
 
@@ -228,18 +226,33 @@ std::ostream &operator<<(std::ostream &os, const String &s)
     os<<s.c_str();
     return os;
 }
+
 std::istream &operator>>(std::istream &is, String &s)
 {
     
-    is>>s._pstr;
-    return is;
+    vector<char> buff;
+	buff.reserve(65535);
+
+	char ch ;
+	while((ch = is.get()) != '\n') {
+		buff.push_back(ch);
+	}
+
+	s = &buff[0];
+	
+	return is;
 }
 
 
 char & String::operator[](std::size_t index)
 {
       
-              return _pstr[index];
+        if(index < strlen(_pstr) && index >=0) {
+      return _pstr[index];
+    } else {
+      static char nullchar = '\0';
+      return nullchar;
+    }
    
      
         
@@ -249,17 +262,9 @@ char & String::operator[](std::size_t index)
 }
 const char & String::operator[](std::size_t index) const
 {
-       cout<<index<<endl;
-       if(_pstr&&index<size())
-        {
-            cout<<1<<endl;
+     
               return _pstr[index];
-        }  
-        else
-        {
-            return '#';
-        }
-        
+     
     
             
 

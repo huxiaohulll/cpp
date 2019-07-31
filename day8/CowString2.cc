@@ -47,8 +47,10 @@ class CowString
 		char & operator=(const char & ch);
 
 		//执行读操作
-		friend std::ostream & operator<<(std::ostream & os, const CharProxy & rhs);
-	
+		operator char() {	
+			//cout << "operator char()" << endl;	
+			return self._pstr[index]; 
+		}
 	private:
 		CowString & self;
 		int index;
@@ -134,7 +136,7 @@ class CowString
         CharProxy  operator[](int index);//要把pstr转换为新的bowstring对象的pstr的地址，修改版本的
         
         friend  std::ostream & operator<<(std::ostream & os, const CowString & cstr);
-        friend std::ostream & operator<<(std::ostream & os, const CharProxy & rhs);
+       // friend std::ostream & operator<<(std::ostream & os, const CharProxy & rhs);
         const char* c_str() const
         {
             return _pstr;
@@ -207,14 +209,11 @@ std::ostream & operator<<(std::ostream & os, const CowString & cstr)
 //写操作
 char & CowString::CharProxy::operator=(const char & ch)
 {
-     cout<<"cowstring charproxy operator ="<<endl;
-     cout<<index<<endl;
-    if(index>=0 && index<self.size())//在此范围内
+
+    if(index>=0&&index<strlen(self._pstr))//在此范围内
     {
-        cout<<"-----"<<endl;
         if(self.recount()>1)
         {
-            cout<<"-----++++"<<endl;
             self.subcount();//计数减一
             char * ptm=new char [self.size()+5]()+4;
             strcpy(ptm,self._pstr);
@@ -237,12 +236,6 @@ char & CowString::CharProxy::operator=(const char & ch)
 
 //读操作
 
-
-std::ostream & operator<<(std::ostream & os, const CowString::CharProxy & rhs) 
-{
-	os << rhs.self._pstr[rhs.index];
-	return os;
-}
 
 
 
@@ -297,7 +290,6 @@ CowString s1 = "hello,world";
 	cout << "s3's refcount = " << s3.recount() << endl;
 
 	return 0;
-    
     
 
 }

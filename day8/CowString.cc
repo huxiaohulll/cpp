@@ -34,17 +34,18 @@ class CowString
         CowString(const char * str)
         :_pstr(new char[5+strlen(str)]()+4)
         {
+            cout<<"Cowstring(const char *)"<<endl;
              initcount();
              strcpy(_pstr,str);
-             cout<<"Cowstring(const char *)"<<endl;
+             
 
         }
-        CowString(CowString& ctr)
+        CowString(const CowString& ctr)
         :_pstr(ctr._pstr)
         {
              //引用数+1;
              addcount();
-             cout<<"Cowstring(const char *)"<<endl;
+             cout<<"Cowstring(const &str)"<<endl;
 
         }
         ~CowString()
@@ -69,6 +70,7 @@ class CowString
 
 
         }
+     
 
         char  & operator[](int index)//要把pstr转换为新的bowstring对象的pstr的地址，修改版本的
         {
@@ -163,9 +165,11 @@ std::ostream & operator<<(std::ostream & os, const CowString & cstr)
 int main()
 {
 
-    CowString s1("huwanting");
+    CowString s1="huwanting";
     CowString s2("huwanting");
-    CowString s3=s1;
+    CowString s3=s1;//没用重载等于号
+    s3=s1;
+    
 
     cout << "s1 = " << s1 << endl;
 	cout << "s2 = " << s2 << endl;
